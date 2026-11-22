@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: ml-process-assignment
+    runtime: python
+    plan: free
+    buildCommand: pip install -r outputs/requirements.txt && python outputs/ml_assignment.py && DJANGO_DEBUG=true python outputs/webapp/manage.py collectstatic --noinput
+    startCommand: cd outputs/webapp && python -m gunicorn ml_site.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --timeout 120
+    healthCheckPath: /health/
+    envVars:
+      - key: DJANGO_DEBUG
+        value: "false"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_SECURE_SSL_REDIRECT
+        value: "true"
+      - key: DJANGO_USE_HTTPS_PROXY
+        value: "true"

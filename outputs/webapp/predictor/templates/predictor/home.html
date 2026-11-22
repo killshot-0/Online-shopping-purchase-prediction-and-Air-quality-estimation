@@ -1,0 +1,7 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>ML Assignment Predictions</title><style>body{font:16px Arial;max-width:820px;margin:40px auto;padding:0 20px;color:#182230}h1{color:#183b56}form,section{padding:20px;margin:18px 0;background:#f2f6f8;border-radius:10px}label{display:block;margin:12px 0 6px}button{margin-top:16px;padding:10px 18px}li{margin:8px 0}.note{color:#475569}</style></head>
+<body><h1>Machine Learning Assignment</h1><p>Upload a CSV file with the input columns used by the selected model. The app returns one prediction per row.</p><p class="note">Educational demonstration only. Predictions are estimates, not medical or environmental safety advice.</p>
+<form method="post" enctype="multipart/form-data">{% csrf_token %}<label for="task">Prediction task</label><select name="task" id="task"><option value="shopping">Online shopping purchase</option><option value="air">Air quality CO concentration</option></select><label for="csv_file">CSV file</label><input type="file" name="csv_file" id="csv_file" accept=".csv" required><button type="submit">Get predictions</button></form>
+{% if error %}<section><strong>Could not make predictions:</strong> {{ error }}</section>{% endif %}
+{% if result %}<section><h2>Predictions</h2><ol>{% for row in result %}<li>{{ row.prediction }}{% if row.probability %} (purchase probability: {{ row.probability }}){% endif %}</li>{% endfor %}</ol></section>{% endif %}
+</body></html>

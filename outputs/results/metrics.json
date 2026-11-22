@@ -1,0 +1,42 @@
+{
+  "online_shopping_classification": {
+    "rows": 12330,
+    "features": 17,
+    "purchase_rate": 0.15474452554744525,
+    "positive_label": "Revenue=True (purchase)",
+    "validation_f1": 0.6282608695652174,
+    "test_accuracy": 0.8564476885644768,
+    "test_precision": 0.5252707581227437,
+    "test_recall": 0.7617801047120419,
+    "test_f1": 0.6217948717948718,
+    "test_roc_auc": 0.9070567575443922,
+    "confusion_matrix": [
+      [
+        1821,
+        263
+      ],
+      [
+        91,
+        291
+      ]
+    ],
+    "best_params": {
+      "model__C": 0.1
+    }
+  },
+  "air_quality_regression": {
+    "rows_after_missing_target_removal": 7674,
+    "features": 14,
+    "target": "CO(GT) in mg/m^3",
+    "missing_predictor_cells_before_imputation": 10583,
+    "split": "chronological 60/20/20",
+    "validation_rmse": 0.8509423584700186,
+    "test_rmse": 0.5366078915489245,
+    "test_mae": 0.34556404277852315,
+    "test_r2": 0.8407127703313315,
+    "best_params": {
+      "model__alpha": 0.1
+    }
+  },
+  "random_seed": 42
+}
