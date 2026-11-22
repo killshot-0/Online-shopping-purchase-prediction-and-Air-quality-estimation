@@ -2,6 +2,8 @@
 
 This project demonstrates two supervised machine learning tasks using public datasets: classification for online shopping purchases and regression for air quality. A Django app lets a user submit CSV feature data for predictions and view the regression exploration charts.
 
+**Live app:** [https://ml-process-assignment.onrender.com](https://ml-process-assignment.onrender.com)
+
 ## Project purpose
 
 - **Classification:** predict whether an online shopping session ends in a purchase.
