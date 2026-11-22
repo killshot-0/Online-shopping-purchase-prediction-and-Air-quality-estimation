@@ -44,6 +44,7 @@ These analyses show patterns in the data; correlations do not establish causes.
 | Shopping classification | Test recall | 76.18% |
 | Shopping classification | Test F1 | 62.18% |
 | Shopping classification | Test ROC-AUC | 0.907 |
+| Shopping classification | Test average precision | 0.639 |
 | Air quality regression | Test RMSE | 0.537 mg/m³ |
 | Air quality regression | Test MAE | 0.346 mg/m³ |
 | Air quality regression | Test R² | 0.841 |
@@ -63,7 +64,7 @@ python -m pip install -r outputs\requirements.txt
 python outputs\ml_assignment.py
 ```
 
-The script trains both models and creates `outputs/results/`, including the metrics JSON, analysis charts, confusion matrix, test predictions, and saved model files.
+The script trains both models and creates `outputs/results/`, including the metrics JSON, regression exploration charts, shopping confusion-matrix, ROC and precision-recall plots, air-quality observed-versus-predicted and residual plots, test predictions, and saved model files.
 
 ## Run the Django app locally
 

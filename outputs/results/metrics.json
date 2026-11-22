@@ -10,6 +10,7 @@
     "test_recall": 0.7617801047120419,
     "test_f1": 0.6217948717948718,
     "test_roc_auc": 0.9070567575443922,
+    "test_average_precision": 0.6390549578040098,
     "confusion_matrix": [
       [
         1821,

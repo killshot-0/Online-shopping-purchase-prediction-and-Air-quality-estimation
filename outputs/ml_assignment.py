@@ -11,7 +11,8 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.linear_model import LogisticRegression, Ridge
 from sklearn.metrics import (accuracy_score, precision_score, recall_score, f1_score,
-    roc_auc_score, confusion_matrix, mean_absolute_error, mean_squared_error, r2_score)
+    roc_auc_score, roc_curve, precision_recall_curve, average_precision_score,
+    confusion_matrix, mean_absolute_error, mean_squared_error, r2_score)
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 import joblib
 
@@ -38,9 +39,30 @@ def online_shopping():
       'validation_f1':float(f1_score(yval,pv)),'test_accuracy':float(accuracy_score(ytest,pt)),
       'test_precision':float(precision_score(ytest,pt)),'test_recall':float(recall_score(ytest,pt)),
       'test_f1':float(f1_score(ytest,pt)),'test_roc_auc':float(roc_auc_score(ytest,proba)),
+      'test_average_precision':float(average_precision_score(ytest,proba)),
       'confusion_matrix':confusion_matrix(ytest,pt).tolist(),'best_params':grid.best_params_}
     joblib.dump(model,OUT/'online_purchase_model.joblib')
-    pd.DataFrame(confusion_matrix(ytest,pt),index=['actual no','actual yes'],columns=['pred no','pred yes']).to_csv(OUT/'purchase_confusion_matrix.csv')
+    cm=confusion_matrix(ytest,pt)
+    pd.DataFrame(cm,index=['actual no','actual yes'],columns=['pred no','pred yes']).to_csv(OUT/'purchase_confusion_matrix.csv')
+    fig,ax=plt.subplots(figsize=(6,5)); im=ax.imshow(cm,cmap='Blues')
+    ax.set_xticks([0,1],['No purchase','Purchase']); ax.set_yticks([0,1],['No purchase','Purchase'])
+    ax.set_xlabel('Predicted label'); ax.set_ylabel('Actual label'); ax.set_title('Online shopping confusion matrix (test set)')
+    for i in range(2):
+        for j in range(2): ax.text(j,i,str(cm[i,j]),ha='center',va='center',color='white' if cm[i,j]>cm.max()/2 else 'black')
+    fig.colorbar(im,ax=ax,label='Number of sessions'); fig.tight_layout()
+    fig.savefig(OUT/'purchase_confusion_matrix.png',dpi=180); plt.close(fig)
+    fpr,tpr,_=roc_curve(ytest,proba)
+    fig,ax=plt.subplots(figsize=(6,5)); ax.plot(fpr,tpr,lw=2,label=f"Logistic regression (AUC = {metrics['test_roc_auc']:.3f})")
+    ax.plot([0,1],[0,1],'--',color='gray',label='Random ranking')
+    ax.set(xlabel='False positive rate',ylabel='True positive rate',title='Online shopping ROC curve (test set)',xlim=(0,1),ylim=(0,1.02))
+    ax.legend(loc='lower right'); ax.grid(alpha=.2); fig.tight_layout()
+    fig.savefig(OUT/'purchase_roc_curve.png',dpi=180); plt.close(fig)
+    precision,recall,_=precision_recall_curve(ytest,proba)
+    fig,ax=plt.subplots(figsize=(6,5)); ax.plot(recall,precision,lw=2,label=f"Average precision = {metrics['test_average_precision']:.3f}")
+    ax.axhline(float(ytest.mean()),linestyle='--',color='gray',label=f"Test purchase rate = {ytest.mean():.3f}")
+    ax.set(xlabel='Recall',ylabel='Precision',title='Online shopping precision-recall curve (test set)',xlim=(0,1),ylim=(0,1.02))
+    ax.legend(loc='best'); ax.grid(alpha=.2); fig.tight_layout()
+    fig.savefig(OUT/'purchase_precision_recall_curve.png',dpi=180); plt.close(fig)
     return metrics
 
 def air_quality():
@@ -94,7 +116,17 @@ def air_quality():
       'test_mae':float(mean_absolute_error(yte,pt)),'test_r2':float(r2_score(yte,pt)),'best_params':grid.best_params_}
     joblib.dump(model,OUT/'air_quality_co_model.joblib')
     pd.DataFrame({'actual':yte,'predicted':pt}).to_csv(OUT/'air_quality_test_predictions.csv',index=False)
-    plt.figure(figsize=(6,5)); plt.scatter(yte,pt,s=12,alpha=.5); plt.xlabel('Observed CO(GT)'); plt.ylabel('Predicted CO(GT)'); plt.title('Air quality test predictions'); plt.tight_layout(); plt.savefig(OUT/'air_quality_test_plot.png',dpi=150); plt.close()
+    fig,ax=plt.subplots(figsize=(6,5)); ax.scatter(yte,pt,s=12,alpha=.5)
+    lo=min(float(yte.min()),float(pt.min())); hi=max(float(yte.max()),float(pt.max()))
+    ax.plot([lo,hi],[lo,hi],'--',color='gray',label='Ideal prediction')
+    ax.set_xlabel('Observed CO(GT) (mg/m³)'); ax.set_ylabel('Predicted CO(GT) (mg/m³)')
+    ax.set_title('Air quality: observed vs predicted (test set)'); ax.legend(); ax.grid(alpha=.2)
+    fig.tight_layout(); fig.savefig(OUT/'air_quality_test_plot.png',dpi=180); plt.close(fig)
+    residuals=yte.to_numpy()-pt
+    fig,ax=plt.subplots(figsize=(6,5)); ax.scatter(pt,residuals,s=12,alpha=.5)
+    ax.axhline(0,color='gray',linestyle='--'); ax.set_xlabel('Predicted CO(GT) (mg/m³)')
+    ax.set_ylabel('Residual (actual − predicted, mg/m³)'); ax.set_title('Air quality residual plot (test set)')
+    ax.grid(alpha=.2); fig.tight_layout(); fig.savefig(OUT/'air_quality_residual_plot.png',dpi=180); plt.close(fig)
     return metrics
 
 if __name__=='__main__':
